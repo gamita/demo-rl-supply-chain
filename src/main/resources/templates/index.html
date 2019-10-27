@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Supply Chain RL</title>
+<link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link href="/webjars/chartjs/Chart.min.css" rel="stylesheet">
+<script src="/webjars/jquery/jquery.min.js"></script>
+<script src="/webjars/chartjs/Chart.min.js"></script>
+<script src="/webjars/sockjs-client/sockjs.min.js"></script>
+<script src="/webjars/stomp-websocket/stomp.min.js"></script>
+<style type="text/css">
+body {
+	padding: 10px 50px 10px 50px;
+	font-size: 18px;
+}
+
+.badge {
+	font-size: 24px;
+}
+</style>
+</head>
+<body>
+	<nav class="navbar">
+		<h2>Demo RL for Supply Chain</h2>
+	</nav>
+	<hr />
+	<section>
+		<button id="startButton" class="btn btn-info btn-lg m-3" onclick="startTraining()">Start Training</button>
+		<label id="startLabel" class="text-info invisible">Training has started.</label>
+	</section>
+	<hr />
+	<h2>Live</h2>
+	<div id="renderingSwitchArea" class="custom-control custom-switch m-3">
+		<input id="renderingSwitch" type="checkbox" class="custom-control-input" onchange="updateLiveMode(event)">
+		<label class="custom-control-label" for="renderingSwitch"> Rendering</label>
+		<label class="ml-3"> ( If switch on, simulation process displays below, instead that learning speed is getting slow. If switch off, it's opposite. )</label>
+	</div>
+	<section id="liveContents" class="container text-center" style="display: none;">
+		<div class="row mt-2 ">
+			<div class="col-lg-2 offset-lg-1">
+				<label class="font-weight-bold">
+					Step: #
+					<span id="stepCounter"></span>
+				</label>
+			</div>
+			<div class="col-lg-4">
+				<label class="font-weight-bold">
+					Reward:
+					<span id="rewardValue" class="badge badge-pill"></span>
+				</label>
+			</div>
+			<div class="col-lg-4">
+				<span> ( Reward = Base Point + Total Penalties ) </span>
+			</div>
+		</div>
+		<hr style="width: 85%" />
+		<div class="row mt-5">
+			<div class="col-lg-2 offset-lg-1">
+				<label>
+					Next Order Qty: <br />
+					<span id="nextOrderQty"></span>
+				</label>
+			</div>
+			<div class="col-lg-2">
+				<label>
+					Order Qty: <br />
+					<span id="orderQty"></span>
+				</label>
+			</div>
+			<div class="col-lg-2">
+				<label id="purchaseActionLabel" class="invisible text-info font-weight-bold">Purchase</label>
+			</div>
+			<div class="col-lg-2">
+				<label>
+					Purchase Qty: <br />
+					<span id="purchaseQty"></span>
+				</label>
+			</div>
+			<div class="col-lg-2">
+				<label id="produceActionLabel" class="invisible text-info font-weight-bold">Produce</label>
+			</div>
+		</div>
+		<div class="row mt-1">
+			<div class="col-lg-2 offset-lg-1">
+				<button type="button" class="btn btn-dark btn-lg p-4">Customer</button>
+			</div>
+			<div class="col-lg-2">
+				<svg style="width: 100px; height: 24px;">
+					<path d="M70 0 L100 12 L70 24 L70 18 L0 18 L0 6 L70 6 Z" fill="dimgray" />
+				</svg>
+				<svg style="width: 100px; height: 24px;">
+					<path d="M30 0 L0 12 L30 24 L30 18 L100 18 L100 6 L30 6 Z" fill="dimgray" />
+				</svg>
+			</div>
+			<div class="col-lg-2">
+				<button type="button" class="btn btn-dark btn-lg p-4">Retailer</button>
+			</div>
+			<div class="col-lg-2">
+				<svg style="width: 100px; height: 24px;">
+					<path d="M70 0 L100 12 L70 24 L70 18 L0 18 L0 6 L70 6 Z" fill="dimgray" />
+				</svg>
+				<svg style="width: 100px; height: 24px;">
+					<path d="M30 0 L0 12 L30 24 L30 18 L100 18 L100 6 L30 6 Z" fill="dimgray" />
+				</svg>
+			</div>
+			<div class="col-lg-2">
+				<button type="button" class="btn btn-dark btn-lg p-4">Factory</button>
+			</div>
+			<div class="col-lg-1">
+				<label>
+					Production Qty: <br />
+					<span id="productionQty"></span>
+				</label>
+			</div>
+		</div>
+		<div class="row mt-2">
+			<div class="col-lg-2 offset-lg-3">
+				<label>
+					Sales Qty: <br />
+					<span id="salesQty"></span>
+				</label>
+			</div>
+			<div class="col-lg-2">
+				<label>
+					Inventory Qty: <br />
+					<span id="retailerInventoryQty"></span>
+				</label>
+			</div>
+			<div class="col-lg-2">
+				<label>
+					Shipment Qty: <br />
+					<span id="shipmentQty"></span>
+				</label>
+			</div>
+			<div class="col-lg-2">
+				<label>
+					Inventory Qty: <br />
+					<span id="factoryInventoryQty"></span>
+				</label>
+			</div>
+		</div>
+		<div class="row mt-2">
+			<div class="col-lg-2">
+				<label class="font-weight-bold">
+					Base Point: <br />
+					<span class="mt-3 badge badge-pill badge-success">1</span>
+				</label>
+			</div>
+			<div class="col-lg-2 offset-lg-1">
+				<label id="chanceLossLabel" class="invisible text-danger font-weight-bold">Chance Loss !</label>
+				<br />
+				<label>
+					<span id="chanceLossDeduction" class="invisible badge badge-pill badge-danger">-2</span>
+				</label>
+			</div>
+			<div class="col-lg-2">
+				<div class="progress">
+					<div id="retailerInventoryGauge" class="progress-bar" role="progressbar" style="width: 0%"></div>
+				</div>
+				<label id="overRetailerInventoryLabel" class="invisible text-danger font-weight-bold">Over Stock !</label>
+				<br />
+				<label>
+					<span id="retailerInventoryDeduction" class="invisible badge badge-pill badge-danger"></span>
+				</label>
+			</div>
+			<div class="col-lg-2">
+				<label id="shipmentLossLabel" class="invisible text-danger font-weight-bold">Shipment Loss !</label>
+				<br />
+				<label>
+					<span id="shipmentLossDeduction" class="invisible badge badge-pill badge-danger">-2</span>
+				</label>
+			</div>
+			<div class="col-lg-2">
+				<div class="progress">
+					<div id="factoryInventoryGauge" class="progress-bar" role="progressbar" style="width: 0%"></div>
+				</div>
+				<label id="overFactoryInventoryLabel" class="invisible text-danger font-weight-bold">Over Stock !</label>
+				<br />
+				<label>
+					<span id="factoryInventoryDeduction" class="invisible badge badge-pill badge-danger"></span>
+				</label>
+			</div>
+		</div>
+	</section>
+	<hr />
+	<h2>Report</h2>
+	<section>
+		<button class="btn btn-info btn-lg m-3" onclick="report()">Report</button>
+		<div class="width-100">
+			<canvas id="supplyTransition">No data</canvas>
+		</div>
+		<div class="width-100 mt-5">
+			<canvas id="rewardHistory">No data</canvas>
+		</div>
+	</section>
+</body>
+</html>
+<script type="text/javascript">
+
+	function startTraining() {
+
+		jQuery.ajax({
+			url: '/training',
+			type:'POST',
+			dataType: 'json',
+		})
+		.done((data) => {
+			jQuery('#startButton').addClass('disabled').attr('disabled', 'disabled');
+			jQuery('#startLabel').removeClass('invisible');
+
+		})
+		.fail((data) => {
+			alert('Error!');
+		});
+	
+	}
+
+
+
+	// Switch live-on/off
+	function updateLiveMode(event) {
+		
+		var liveMode = event.target.checked;
+		
+		if(liveMode){
+			jQuery('#liveContents').show(100);
+		} else {
+			jQuery('#liveContents').hide(100);
+		}
+		
+		jQuery.ajax({
+			url: '/live',
+			type:'POST',
+			dataType: 'json',
+			data: {'liveMode' : liveMode}
+		})
+		.done((data) => {
+		 	// nothing
+		})
+		.fail((data) => {
+			alert('Error!');
+		});
+
+	}
+
+
+
+	// Display report chart
+	
+	// Chart objects of chartjs
+	var stepChart = null;
+	var rewardChart = null;
+
+	function report() {
+		
+		jQuery.ajax({
+			url: '/step-report?size=100',
+			type:'GET',
+			dataType: 'json',
+		})
+		.done((steps) => {
+	
+			var x = [];
+			var retailerInventoryQuantity = [];
+			var factoryInventoryQuantity = [];
+			var thisTimeOrderQuantity = [];
+			var chanceLossQuantity = [];
+			var shipmentLossQuantity = [];
+			var reward = [];
+			
+			for(var stepIndex in steps) {
+				x.push(stepIndex);
+				retailerInventoryQuantity.push(steps[stepIndex].retailerInventoryQuantity);
+				factoryInventoryQuantity.push(steps[stepIndex].factoryInventoryQuantity);
+				thisTimeOrderQuantity.push(steps[stepIndex].thisTimeOrderQuantity);
+				chanceLossQuantity.push(steps[stepIndex].chanceLossQuantity);
+				shipmentLossQuantity.push(steps[stepIndex].shipmentLossQuantity);
+				reward.push(steps[stepIndex].reward);
+			}
+			
+			var dataSet = {
+					labels: x,
+					datasets: [
+					{
+						label: 'This Time Order Quantity',
+						borderColor: 'silver',
+						fill: false,
+						data: thisTimeOrderQuantity,
+						yAxisID: 'quantity-axis'
+					}, {
+						label: 'Retailer Inventory Quantity',
+						borderColor: 'lime',
+						fill: false,
+						data: retailerInventoryQuantity,
+						yAxisID: 'quantity-axis'
+					}, {
+						label: 'Factory Inventory Quantity',
+						borderColor: 'cornflowerblue',
+						fill: false,
+						data: factoryInventoryQuantity,
+						yAxisID: 'quantity-axis'
+					}, {
+						label: 'Chance Loss Quantity',
+						borderColor: 'tomato',
+						fill: false,
+						data: chanceLossQuantity,
+						yAxisID: 'quantity-axis'
+					}, {
+						label: 'Shipment Loss Quantity',
+						borderColor: 'salmon',
+						fill: false,
+						data: shipmentLossQuantity,
+						yAxisID: 'quantity-axis'
+					}, {
+						label: 'Reward',
+						borderColor: 'gold',
+						fill: false,
+						data: reward,
+						yAxisID: 'reward-axis',
+						showLines: false
+					}]
+				};
+	
+
+			if(stepChart != null) stepChart.destroy(); // clear a previous chart
+			
+			stepChart = new Chart(
+				document.getElementById('supplyTransition').getContext('2d'), 
+				{
+					type: 'line',
+					data: dataSet,
+					options: {
+						responsive: true,
+						title: {
+							display: true,
+							text: 'Last 100 Steps Transition ',
+							fontSize: 22
+						},
+						scales: {
+							xAxes: [{
+								scaleLabel: {
+									display: true,
+									labelString: 'Step',
+									fontSize: 18
+								}
+							}],
+							yAxes: [{
+								id: 'quantity-axis',
+								scaleLabel: {
+									display: true,
+									labelString: 'Quantity',
+									fontSize: 18
+								}
+							}, {
+								id: 'reward-axis',
+								scaleLabel: {
+									display: true,
+									labelString: 'Reward',
+									fontSize: 18
+								},
+								position: 'right',
+							}]
+						}
+				}
+			});
+			
+		})
+		.fail((data) => {
+			alert('Error!')
+		});
+
+
+
+		jQuery.ajax({
+			url: '/reward-report',
+			type:'GET',
+			dataType: 'json',
+		})
+		.done((rewardsHistory) => {
+
+			var x = [];
+			var rewards = [];
+			
+			for(var rewardsIndex in rewardsHistory) {
+				x.push(+rewardsIndex + 1);
+				rewards.push(rewardsHistory[rewardsIndex]);
+			}
+			
+			var dataSet = {
+					labels: x,
+					datasets: [
+					{
+						label: 'Sum of Rewards in each Episode',
+						borderColor: 'gold',
+						fill: false,
+						data: rewards,
+						yAxisID: 'reward-axis'
+					}]
+				}
+
+
+			if(rewardChart != null) rewardChart.destroy(); // clear a previous chart
+			
+			rewardChart = new Chart(
+					document.getElementById('rewardHistory').getContext('2d'), 
+					{
+						type: 'line',
+						data: dataSet,
+						options: {
+							responsive: true,
+							title: {
+								display: true,
+								text: 'Reward History ',
+								fontSize: 22
+							},
+							scales: {
+								xAxes: [{
+									scaleLabel: {
+										display: true,
+										labelString: 'Episode',
+										fontSize: 18
+									}
+								}],
+								yAxes: [{
+									id: 'reward-axis',
+									display: true,
+									scaleLabel: {
+										display: true,
+										labelString: 'Sum of Rewards',
+										fontSize: 18
+									},
+								}]
+							}
+					}
+				});
+			
+		})
+		.fail((data) => {
+			alert('Error!');
+		});
+	
+	}
+
+
+
+	// Display live area
+	var stompClient = null;
+	var socket = new SockJS('/ws');
+
+	stompClient = Stomp.over(socket);
+	stompClient.connect({}, function (frame) {	
+
+		stompClient.subscribe('/topic/action-result', function (data) {
+
+		var publishInfo = JSON.parse(data.body);
+		
+		jQuery('#stepCounter').text(publishInfo.stepNo);
+
+		var actionResult = publishInfo.actionResult;
+		
+		// show action
+		jQuery('#purchaseActionLabel').removeClass(actionResult.includePurchaseAction ? 'invisible' : 'visible').addClass(actionResult.includePurchaseAction ? 'visible' : 'invisible');
+		jQuery('#produceActionLabel').removeClass(actionResult.includeProduceAction ? 'invisible' : 'visible').addClass(actionResult.includeProduceAction ? 'visible' : 'invisible');
+
+
+		// show reward
+		jQuery('#rewardValue').text(actionResult.reward);
+		jQuery('#rewardValue').removeClass(actionResult.reward > 0 ? 'badge-danger' : 'badge-success').addClass(actionResult.reward > 0 ? 'badge-success' : 'badge-danger');
+		jQuery('#chanceLossDeduction').removeClass(actionResult.chanceLoss ? 'invisible' : 'visible').addClass(actionResult.chanceLoss ? 'visible' : 'invisible');
+		jQuery('#shipmentLossDeduction').removeClass(actionResult.shipmentLoss ? 'invisible' : 'visible').addClass(actionResult.shipmentLoss ? 'visible' : 'invisible');
+		jQuery('#retailerInventoryDeduction').removeClass(actionResult.overRetailerInventory ? 'invisible' : 'visible').addClass(actionResult.overRetailerInventory ? 'visible' : 'invisible');
+		jQuery('#retailerInventoryDeduction').text(actionResult.tripleOverRetailerInventory ? '-2' : (actionResult.doubleOverRetailerInventory ? '-1' : '0'));
+		jQuery('#factoryInventoryDeduction').removeClass(actionResult.overFactoryInventory ? 'invisible' : 'visible').addClass(actionResult.overFactoryInventory ? 'visible' : 'invisible');
+		jQuery('#factoryInventoryDeduction').text(actionResult.tripleOverFactoryInventory ? '-2' : (actionResult.doubleOverFactoryInventory ? '-1' : '0'));
+
+
+		// show event qty
+		jQuery('#orderQty').text(actionResult.thisTimeOrderQuantity);
+		jQuery('#nextOrderQty').text(actionResult.nextTimeOrderQuantity);
+		jQuery('#chanceLossLabel').removeClass(actionResult.chanceLoss ? 'invisible' : 'visible').addClass(actionResult.chanceLoss ? 'visible' : 'invisible');
+		jQuery('#salesQty').text(actionResult.thisTimeOrderQuantity - actionResult.chanceLossQuantity);
+		jQuery('#purchaseQty').text(actionResult.purchaseQuantity);
+		jQuery('#shipmentQty').text(actionResult.purchaseQuantity - actionResult.shipmentLossQuantity);
+		jQuery('#shipmentLossLabel').removeClass(actionResult.shipmentLoss ? 'invisible' : 'visible').addClass(actionResult.shipmentLoss ? 'visible' : 'invisible');
+		jQuery('#productionQty').text(actionResult.producionQuantity);
+
+
+		// show inventory qty
+		jQuery('#retailerInventoryQty').text(actionResult.retailerInventoryQuantity);
+		jQuery('#overRetailerInventoryLabel').removeClass(actionResult.overRetailerInventory ? 'invisible' : 'visible').addClass(actionResult.overRetailerInventory ? 'visible' : 'invisible');
+		jQuery('#retailerInventoryDeduction').removeClass(actionResult.overRetailerInventory ? 'invisible' : 'visible').addClass(actionResult.overRetailerInventory ? 'visible' : 'invisible');
+		jQuery('#retailerInventoryGauge').removeClass(actionResult.overRetailerInventory ? 'bg-success' : 'bg-danger').addClass(actionResult.overRetailerInventory ? 'bg-danger' : 'bg-success');
+		var retailerInventoryOfGauge = Math.min(actionResult.retailerInventoryQuantity, 100);
+		jQuery('#retailerInventoryGauge').css('width', ((retailerInventoryOfGauge / 100) * 100) + '%')
+		jQuery('#factoryInventoryQty').text(actionResult.factoryInventoryQuantity);
+		jQuery('#overFactoryInventoryLabel').removeClass(actionResult.overFactoryInventory ? 'invisible' : 'visible').addClass(actionResult.overFactoryInventory ? 'visible' : 'invisible');
+		jQuery('#factoryInventoryGauge').removeClass(actionResult.overFactoryInventory ? 'bg-success' : 'bg-danger').addClass(actionResult.overFactoryInventory ? 'bg-danger' : 'bg-success');
+		var factoryInventoryOfGauge = Math.min(actionResult.factoryInventoryQuantity, 265);
+		jQuery('#factoryInventoryGauge').css('width', ((factoryInventoryOfGauge / 265) * 100) + '%')
+
+
+		});
+	});
+
+
+</script>
