@@ -82,7 +82,7 @@ public class SupplyEnvironment {
 	 * @param action
 	 * @return action result
 	 */
-	public ActionResult action(Integer action) {
+	public ActionResult receiveAction(Integer action) {
 
 		ActionResult actionResult = null;
 

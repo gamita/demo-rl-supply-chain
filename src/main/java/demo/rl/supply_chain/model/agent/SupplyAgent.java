@@ -70,7 +70,7 @@ public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 
 
 		// execute a given action.
-		ActionResult actionResult = this.environment.action(action);
+		ActionResult actionResult = this.environment.receiveAction(action);
 
 
 		// acquired reward value after action

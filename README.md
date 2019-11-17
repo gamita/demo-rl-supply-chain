@@ -5,7 +5,7 @@ This application is a demo application of RL4J (see https://deeplearning4j.org/)
 This application is a motif of "Beer Distribution Game". (see https://en.wikipedia.org/wiki/Beer_distribution_game).  
 "Retailer" and "Factory" manage to balance both supply and inventory not to be overstock and chance/ship loss.  
 
-<img src="simulation-process.gif" style="width: 700px; margin: 30px;">
+<img src="./images/simulation-process.gif" style="width: 700px; margin: 30px;">
 
 
 ## Prerequisites
@@ -64,20 +64,20 @@ and a simulation process will be displayed on your browser after a while. (, whe
 ## Screenshots
 
 ### Balancing Supply and Inventory
-<img src="simulation-process.gif" style="width: 700px; margin: 30px;">
+<img src="./images/simulation-process.gif" style="width: 700px; margin: 30px;">
 
 ### Transition of Steps
-<img src="step-transition.png" style="width: 700px; margin: 30px;">
+<img src="./images/step-transition.png" style="width: 700px; margin: 30px;">
 
 ### Reward History
-<img src="reward-history.png" style="width: 700px; margin: 30px;">
+<img src="./images/reward-history.png" style="width: 700px; margin: 30px;">
 
 ## Reinforcement Learning
 
 ### Environment:
 This picture shows the characters in this simulation game.
 
-<img src="environment.png" style="width: 700px; margin: 30px;">
+<img src="./images/environment.png" style="width: 700px; margin: 30px;">
 
 The customer order X items every step.  
 X is a random number between 1 and 15.  
@@ -145,7 +145,7 @@ Penalties are negative rewards such like following.
 #### Reward Example:
 
 if the retailer happens a chance loss and factory has double over stock,  
-then Reward = Base Point + Total Penalty = 1 -2 -1 = -2 .
+then Reward = Base Point + Total Penalty = 1 + (-2 -1) = -2 .
 
 if the retailer/factory happens no chance/ship loss and has no over stock,  
 then Reward = Base Point + Total Penalty = 1 + 0 = 1 .
