@@ -163,7 +163,7 @@ Please refer to the links below.
 
    a presentation document regarding this app.  (in Japanese)  
 
-   SlideShare  (now in preparation. )
+   https://www.slideshare.net/YukiTagami1/rl4j
 
 
 2. **DL4J**
