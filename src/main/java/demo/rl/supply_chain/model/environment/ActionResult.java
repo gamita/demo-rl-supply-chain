@@ -1,6 +1,5 @@
 package demo.rl.supply_chain.model.environment;
 
-import java.util.Arrays;
 import java.util.Queue;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -27,7 +26,7 @@ public class ActionResult {
 	private int action;
 
 
-	private SupplyState supplyState;
+	private SupplyState nextState;
 
 
 	private double retailerInventoryQuantity;
@@ -63,14 +62,21 @@ public class ActionResult {
 	 * @param shipmentLossQuantity
 	 * 
 	 */
-	public ActionResult(int action, Queue<Double> customerOrderState, double retailernventoryQuantity, double factoryInventoryQuantity, double thisTimeOrderQuantity, double nextTimeOrderQuantity,
-		double chanceLossQuantity, double shipmentLossQuantity) {
+	public ActionResult(
+			int action,
+			Queue<Double> customerOrderState,
+			double retailernventoryQuantity,
+			double factoryInventoryQuantity,
+			double thisTimeOrderQuantity,
+			double nextTimeOrderQuantity,
+			double chanceLossQuantity,
+			double shipmentLossQuantity) {
 
 		super();
 
 		this.action = action;
 
-		this.supplyState = new SupplyState(customerOrderState, retailernventoryQuantity, factoryInventoryQuantity);
+		this.nextState = new SupplyState(customerOrderState, retailernventoryQuantity, factoryInventoryQuantity);
 
 		this.retailerInventoryQuantity = retailernventoryQuantity;
 
@@ -101,12 +107,12 @@ public class ActionResult {
 		double reward = 1;
 
 		if (isChanceLoss()) {
-			// deduct 2 point when a chance loss happened.
+			// deduct 2 points when a chance loss happened.
 			reward -= 2;
 		}
 
 		if (isShipmentLoss()) {
-			// deduct 2 point when a shipment loss happened.
+			// deduct 2 points when a shipment loss happened.
 			reward -= 2;
 		}
 
@@ -144,6 +150,7 @@ public class ActionResult {
 	 * @return flag whether chance loss happened or not
 	 */
 	public boolean isChanceLoss() {
+
 		return this.getChanceLossQuantity() > 0;
 	}
 
@@ -155,6 +162,7 @@ public class ActionResult {
 	 * @return flag whether shipment loss happened or not
 	 */
 	public boolean isShipmentLoss() {
+
 		return this.getShipmentLossQuantity() > 0;
 	}
 
@@ -166,6 +174,7 @@ public class ActionResult {
 	 * @return flag whether over-stock at factory loss happened or not
 	 */
 	public boolean isOverFactoryInventory() {
+
 		return isDoubleOverFactoryInventory() || isTripleOverFactoryInventory();
 	}
 
@@ -177,6 +186,7 @@ public class ActionResult {
 	 * @return flag whether double over-stock at factory loss happened or not
 	 */
 	public boolean isDoubleOverFactoryInventory() {
+
 		return this.getFactoryInventoryQuantity() > SupplyEnvironment.PURODUCTION_QUANTITY_PER_TIME * 2;
 	}
 
@@ -188,6 +198,7 @@ public class ActionResult {
 	 * @return flag whether triple over-stock at factory loss happened or not
 	 */
 	public boolean isTripleOverFactoryInventory() {
+
 		return this.getFactoryInventoryQuantity() > SupplyEnvironment.PURODUCTION_QUANTITY_PER_TIME * 3;
 	}
 
@@ -199,6 +210,7 @@ public class ActionResult {
 	 * @return flag whether over-stock at retailer loss happened or not
 	 */
 	public boolean isOverRetailerInventory() {
+
 		return isDoubleOverRetailerInventory() || isTripleOverRetailerInventory();
 	}
 
@@ -210,6 +222,7 @@ public class ActionResult {
 	 * @return flag whether double over-stock at retailer loss happened or not
 	 */
 	public boolean isDoubleOverRetailerInventory() {
+
 		return this.getRetailerInventoryQuantity() > SupplyEnvironment.PURCHASE_QUANTITY_PER_TIME * 2;
 	}
 
@@ -221,6 +234,7 @@ public class ActionResult {
 	 * @return flag whether triple over-stock at retailer loss happened or not
 	 */
 	public boolean isTripleOverRetailerInventory() {
+
 		return this.getRetailerInventoryQuantity() > SupplyEnvironment.PURCHASE_QUANTITY_PER_TIME * 3;
 	}
 
@@ -232,6 +246,7 @@ public class ActionResult {
 	 * @return executed action
 	 */
 	public int getAction() {
+
 		return action;
 	}
 
@@ -243,6 +258,7 @@ public class ActionResult {
 	 * @return flag whether executed action includes purchase operation or not
 	 */
 	public boolean isIncludePurchaseAction() {
+
 		return this.action == SupplyEnvironment.ACTION_PURCHASE || this.action == SupplyEnvironment.ACTION_PURCHASE_AND_PRODUCE;
 	}
 
@@ -254,6 +270,7 @@ public class ActionResult {
 	 * @return flag whether executed action includes production operation or not
 	 */
 	public boolean isIncludeProduceAction() {
+
 		return this.action == SupplyEnvironment.ACTION_PRODUCE || this.action == SupplyEnvironment.ACTION_PURCHASE_AND_PRODUCE;
 	}
 
@@ -265,43 +282,50 @@ public class ActionResult {
 	 * @return next state
 	 */
 	@JsonIgnore
-	public SupplyState getState() {
-		return supplyState;
+	public SupplyState getNextState() {
+
+		return this.nextState;
 	}
 
 
 
 	public double getRetailerInventoryQuantity() {
+
 		return retailerInventoryQuantity;
 	}
 
 
 
 	public double getFactoryInventoryQuantity() {
+
 		return factoryInventoryQuantity;
 	}
 
 
 
 	public double getThisTimeOrderQuantity() {
+
 		return thisTimeOrderQuantity;
 	}
 
 
 
 	public double getNextTimeOrderQuantity() {
+
 		return nextTimeOrderQuantity;
 	}
 
 
 
 	public double getChanceLossQuantity() {
+
 		return chanceLossQuantity;
 	}
 
 
 
 	public double getShipmentLossQuantity() {
+
 		return shipmentLossQuantity;
 	}
 
@@ -313,6 +337,7 @@ public class ActionResult {
 	 * @return qty that retailer purchase items
 	 */
 	public double getPurchaseQuantity() {
+
 		return isIncludePurchaseAction() ? SupplyEnvironment.PURCHASE_QUANTITY_PER_TIME : 0;
 	}
 
@@ -324,6 +349,7 @@ public class ActionResult {
 	 * @return qty that factory produced items
 	 */
 	public double getProducionQuantity() {
+
 		return isIncludeProduceAction() ? SupplyEnvironment.PURODUCTION_QUANTITY_PER_TIME : 0;
 	}
 
@@ -334,11 +360,11 @@ public class ActionResult {
 
 		return "   Reward: " + this.getReward()
 
-			+ "    Chance Loss: " + this.getChanceLossQuantity()
+				+ "    Chance Loss: " + this.getChanceLossQuantity()
 
-			+ "    Shipment Loss: " + this.getShipmentLossQuantity()
+				+ "    Shipment Loss: " + this.getShipmentLossQuantity()
 
-			+ "    State: " + Arrays.toString(this.supplyState.toArray());
+				+ "    Next State: " + this.nextState.getData();
 
 	}
 

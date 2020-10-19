@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.Queue;
 
 import org.deeplearning4j.rl4j.space.Encodable;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
 /**
- * A class preserving state info
+ * A class for state info
  * 
  * @author gamita
  *
@@ -15,22 +17,14 @@ import org.deeplearning4j.rl4j.space.Encodable;
 public class SupplyState implements Encodable {
 
 
-	/** a vector of this supply state */
-	private double[] state;
-
-
-
 	/**
-	 * Constructor:
-	 * 
-	 * @param state
-	 */
-	public SupplyState(double[] state) {
+	 * a vector of the below supply state:
+	 *
+	 * [ This time order qty , Next order qty , Retailer inventory qty, Factory inventory qty]
+	 *
+	 **/
+	private INDArray state;
 
-		super();
-		this.state = state;
-
-	}
 
 
 
@@ -50,26 +44,44 @@ public class SupplyState implements Encodable {
 		stateList.add(retailerInventoryQuantity);
 		stateList.add(factoryInventoryQuantity);
 
-		this.state = stateList.stream().mapToDouble(d -> d).toArray();
+		this.state = Nd4j.create(stateList);
 
 	}
 
 
 
-
-	/**
-	 * return a flat vector of this state
-	 * 
-	 * @see org.deeplearning4j.rl4j.space.Encodable#toArray()
-	 * 
-	 */
 	@Override
-	public double[] toArray() {
+	public INDArray getData() {
 
 		return this.state;
-
 	}
 
+
+
+	@Override
+	public boolean isSkipped() {
+
+		return false;
+	}
+
+
+
+	@Override
+	public Encodable dup() {
+
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	@Deprecated
+	public double[] toArray() {
+
+		return this.state.toDoubleVector();
+
+	}
 
 
 }

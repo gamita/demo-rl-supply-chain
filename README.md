@@ -20,9 +20,9 @@ Before you start this application, you need to install the follows softwares.
 
 ## Using Java Libraries
 
-- DL4J
+- DL4J (1.0.0-beta7)
 
-- RL4J
+- RL4J (1.0.0-beta7)
 
 - Spring Boot
 
@@ -48,17 +48,17 @@ $ cd target
 $ java -jar demo-application.jar
 ```
 
-[Caution: At first time build, it will takes long time to build, due to gather necessary libraries.]
-
-
 After the spring boot server started, you open your browser (Chrome, Firefox, Edge etc. IE isn't supported)  
 and access to http://localhost:8080/ .
 
 Click "Start Training" button, then a learning will start,  
 and a simulation process will be displayed on your browser after a while. (, when live rendering mode is on)
 
+[Note: At first time build, it will takes long time to build, due to gather necessary libraries.]
 
-[Caution: This simple demo application works as a web application. But this is just for demo, so simultaneous access is not supported completely.]
+[Note: If you failed libraries download by Maven, check this blog https://blog.sonatype.com/central-repository-moving-to-https.]
+
+[Caution: This simple demo application works as a web application. But this is just for one-shot demo, so simultaneous access is not supported at all.]
 
 
 ## Screenshots

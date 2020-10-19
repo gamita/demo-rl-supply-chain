@@ -5,7 +5,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 
 
 /**
- * Meta definition class of Observation Space
+ * Meta definition class for Observation Space
  * 
  * @author gamita
  *
@@ -15,20 +15,19 @@ public class SupplyObservationSpace<O> implements ObservationSpace<O> {
 
 
 	/**
-	 * (non-Javadoc)
-	 * 
 	 * @see org.deeplearning4j.rl4j.space.ObservationSpace#getName()
 	 */
 	@Override
 	public String getName() {
+
 		return "Supply Chain Observation Space";
 	}
 
 
+
 	/**
-	 * in the case of this demo:
 	 * 
-	 * Shape of vector = [ This time order qty , Next order qty , Retailer inventory qty, Factory inventory qty]
+	 * shape of the vector: [ This time order qty , Next order qty , Retailer inventory qty, Factory inventory qty]
 	 * 
 	 * i.e. [4]
 	 * 
@@ -42,25 +41,25 @@ public class SupplyObservationSpace<O> implements ObservationSpace<O> {
 	}
 
 
+
 	/**
-	 * (non-Javadoc)
-	 * 
 	 * @see org.deeplearning4j.rl4j.space.ObservationSpace#getLow()
 	 */
 	@Override
 	public INDArray getLow() {
+
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 
+
 	/**
-	 * (non-Javadoc)
-	 * 
 	 * @see org.deeplearning4j.rl4j.space.ObservationSpace#getHigh()
 	 */
 	@Override
 	public INDArray getHigh() {
+
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -10,9 +10,9 @@
 		<relativePath />
 	</parent>
 	<groupId>demo.rl.supply_chain</groupId>
-	<artifactId>demo-application</artifactId>
+	<artifactId>demo-rl-application</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>demo-application</name>
+	<name>demo-rl-application</name>
 	<description>Reinforcement learning demo application for supply chain with RL4J</description>
 
 	<properties>
@@ -25,9 +25,9 @@
 		<dependency>
 			<groupId>org.nd4j</groupId>
 			<artifactId>nd4j-native-platform</artifactId>
-			<version>1.0.0-beta4</version>
+			<version>1.0.0-beta7</version>
 		</dependency>
-		<!-- regarding CUDA, see: https://deeplearning4j.org/docs/latest/deeplearning4j-config-cudnn 
+		<!-- regarding CUDA, see: https://deeplearning4j.konduit.ai/config/backends/config-cudnn 
 		<dependency>
 			<groupId>org.deeplearning4j</groupId>
 			<artifactId>deeplearning4j-cuda-10.0</artifactId>
@@ -37,7 +37,7 @@
 		<dependency>
 			<groupId>org.deeplearning4j</groupId>
 			<artifactId>rl4j-core</artifactId>
-			<version>1.0.0-beta4</version>
+			<version>1.0.0-beta7</version>
 		</dependency>
 
 
@@ -95,7 +95,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
-		<finalName>demo-application</finalName>
+		<finalName>demo-rl-application</finalName>
 	</build>
 
 </project>

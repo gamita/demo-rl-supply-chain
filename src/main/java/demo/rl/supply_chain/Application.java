@@ -43,8 +43,6 @@ public class Application {
 	private static boolean liveMode = false;
 
 
-	private static final Map<String, Object> EMPTY = new HashMap<String, Object>();
-
 
 
 	/**
@@ -54,12 +52,14 @@ public class Application {
 	 * 
 	 */
 	public static void main(String[] args) {
+
 		context = SpringApplication.run(Application.class, args);
 	}
 
 
 
 	public static ConfigurableApplicationContext getContext() {
+
 		return context;
 	}
 
@@ -92,7 +92,7 @@ public class Application {
 
 		this.trainer.startDQNTraining();
 
-		return EMPTY;
+		return new HashMap<>();
 
 	}
 
@@ -113,7 +113,7 @@ public class Application {
 
 		Application.liveMode = _liveMode;
 
-		return EMPTY;
+		return new HashMap<>();
 
 	}
 
@@ -156,7 +156,9 @@ public class Application {
 
 
 
+
 	public static boolean isLiveMode() {
+
 		return liveMode;
 	}
 

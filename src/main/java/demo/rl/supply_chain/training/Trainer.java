@@ -2,16 +2,12 @@ package demo.rl.supply_chain.training;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.deeplearning4j.rl4j.learning.sync.qlearning.QLearning;
+import org.deeplearning4j.rl4j.learning.configuration.QLearningConfiguration;
 import org.deeplearning4j.rl4j.learning.sync.qlearning.discrete.QLearningDiscreteDense;
+import org.deeplearning4j.rl4j.network.configuration.DQNDenseNetworkConfiguration;
 import org.deeplearning4j.rl4j.network.dqn.DQNFactoryStdDense;
-import org.deeplearning4j.rl4j.util.DataManager;
 import org.nd4j.linalg.learning.config.Adam;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +20,7 @@ import demo.rl.supply_chain.model.state.SupplyState;
 /**
  * Trainer class (Singleton)
  * 
- * this class kicks DQN training with set configurations.
+ * This class kicks DQN training with configurations.
  * 
  * 
  * @author gamita
@@ -38,14 +34,6 @@ public class Trainer {
 	private SupplyAgent agent = null;
 
 
-	/** Latch for training state */
-	private AtomicBoolean isInTraining = new AtomicBoolean(false);
-
-
-	/** Logger */
-	private Logger logger = LoggerFactory.getLogger(Trainer.class);
-
-
 	public static final int MAX_STEP_BY_EPOCH = 100;
 
 
@@ -55,7 +43,7 @@ public class Trainer {
 	 *
 	 * As reference:
 	 * 
-	 * https://github.com/eclipse/deeplearning4j-examples/tree/master/rl4j-examples (Thank you, it's helpful.)
+	 * https://github.com/eclipse/deeplearning4j-examples/tree/master/rl4j-examples (thanks the examples.)
 	 * 
 	 * if you want to save (and play) your model after a training, please see above example.
 	 * 
@@ -64,87 +52,73 @@ public class Trainer {
 	public void startDQNTraining() {
 
 
-		// check in training now or not.
-		if (this.isInTraining.getAndSet(true)) {
-			logger.info("Training has already started, and so skip a start request. ");
-			return;
-		}
-
-
-		// create a agent
+		// create an agent
 		this.agent = new SupplyAgent();
 
 
 		// initialize q-learning configuration
-		QLearning.QLConfiguration qlConfig =
+		QLearningConfiguration qlConfig =
 
-			new QLearning.QLConfiguration(
+				QLearningConfiguration.builder()
 
-				1234, // Random seed
+						.seed(1234L)
 
-				MAX_STEP_BY_EPOCH, // Max step By epoch
+						.maxEpochStep(MAX_STEP_BY_EPOCH)
 
-				20000, // Max step
+						.maxStep(20000)
 
-				5000, // Max size of experience replay
+						.expRepMaxSize(5000)
 
-				32, // size of batches
+						.batchSize(32)
 
-				100, // target update (hard)
+						.targetDqnUpdateFreq(100)
 
-				0, // num step noop warmup
+						.updateStart(0)
 
-				1, // reward scaling
+						.rewardFactor(1)
 
-				0.95, // gamma
+						.gamma(0.95)
 
-				3, // td-error clipping
+						.errorClamp(3.0)
 
-				0.01f, // min epsilon
+						.minEpsilon(0.01f)
 
-				10000, // num step for eps greedy anneal
+						.epsilonNbStep(10000)
 
-				true // double DQN
+						.doubleDQN(true)
 
-			);
+						.build();
+
 
 
 
 		// initialize neural network configuration for DQN
-		DQNFactoryStdDense.Configuration qlNet =
+		DQNFactoryStdDense qlNet =
 
-			new DQNFactoryStdDense.Configuration(
+				new DQNFactoryStdDense(
 
-				3, // number of layers
+						DQNDenseNetworkConfiguration.builder()
 
-				16, // number of hidden nodes
+								.numLayers(3)
 
-				0.0001, // l2 regularization
+								.numHiddenNodes(16)
 
-				new Adam(),
+								.l2(0.0001)
 
-				null);
+								.updater(new Adam())
 
+								.build()
 
-		try {
-
-			// DQN training starts (if set a arg of DataManager "true", training info is saved at directories under System.getProperty("user.home") path.)
-			QLearningDiscreteDense<SupplyState> dql = new QLearningDiscreteDense<>(this.agent, qlNet, qlConfig, new DataManager());
-
-			dql.train();
-
-			this.agent.close();
+				);
 
 
-		} catch (Exception e) {
+		QLearningDiscreteDense<SupplyState> dqn = new QLearningDiscreteDense<SupplyState>(this.agent, qlNet, qlConfig);
 
-			throw new RuntimeException(e); // my bad, rough handling.
+		dqn.train();
 
-		} finally {
+		this.agent.close();
 
-			this.isInTraining.set(false);
 
-		}
 
 	}
 
@@ -156,7 +130,7 @@ public class Trainer {
 	 * Return accumulated step transitions
 	 * 
 	 * @param reportSize
-	 *            report size indicates to report last n-size steps
+	 *                   report size indicates to report last n-size steps
 	 * 
 	 * @return list of action-result(including order qty, inventory qty, reward) in each step
 	 * 
@@ -164,7 +138,7 @@ public class Trainer {
 	public List<ActionResult> getStepHistory(int reportSize) {
 
 
-		if (Objects.isNull(this.agent) || agent.getStepHistory().size() < reportSize) {
+		if (this.agent == null || agent.getStepHistory().size() < reportSize) {
 
 			return new ArrayList<>();
 
@@ -189,7 +163,7 @@ public class Trainer {
 	public List<Double> getRewardHistory() {
 
 
-		if (Objects.isNull(this.agent) || agent.getStepHistory().isEmpty()) {
+		if (this.agent == null || agent.getStepHistory().isEmpty()) {
 
 			return new ArrayList<>();
 

@@ -68,7 +68,6 @@ public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 	@Override
 	public StepReply<SupplyState> step(Integer action) {
 
-
 		// execute a given action.
 		ActionResult actionResult = this.environment.receiveAction(action);
 
@@ -76,19 +75,19 @@ public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 		// acquired reward value after action
 		double reward = actionResult.getReward();
 
-		// next state (i.e. time point = t + 1) after action
-		SupplyState nextState = actionResult.getState();
+		// next state after an action  (i.e. time point = t + 1) 
+		SupplyState nextState = actionResult.getNextState();
 
 
 		StepReply<SupplyState> stepReply = new StepReply<SupplyState>(
 
-			nextState,
+				nextState,
 
-			reward,
+				reward,
 
-			this.isDone(),
+				this.isDone(),
 
-			null);
+				null);
 
 		// here is a unrelated method with RL. Just logging, web socket, etc for demo.
 		doSomethingForDemo(actionResult);
@@ -111,6 +110,7 @@ public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 	 */
 	@Override
 	public ObservationSpace<SupplyState> getObservationSpace() {
+
 		return this.observationSpace;
 	}
 
@@ -133,6 +133,7 @@ public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 	 */
 	@Override
 	public DiscreteSpace getActionSpace() {
+
 		return this.actionSpace;
 	}
 
@@ -146,11 +147,12 @@ public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 	@Override
 	public SupplyState reset() {
 
-		logger.info("--- new episode has started. ---");
+		logger.info("--- new episode started. ---");
 
 		this.environment = new SupplyEnvironment();
 
-		return new SupplyState(this.environment.getCustomerOrderState(), this.environment.getRetailerInventoryQuantity(), this.environment.getFactoryInventoryQuantity()); // TODO
+		return new SupplyState(this.environment.getCustomerOrderState(), this.environment.getRetailerInventoryQuantity(),
+				this.environment.getFactoryInventoryQuantity());
 
 	}
 
@@ -163,8 +165,8 @@ public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 	 */
 	@Override
 	public void close() {
-		logger.info("--- training has ended. ---");
-		// TODO finish notification by web socket
+
+		logger.info("--- training ended. ---");
 	}
 
 
@@ -178,6 +180,7 @@ public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 	 */
 	@Override
 	public boolean isDone() {
+
 		return false;
 	}
 
@@ -235,7 +238,7 @@ public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 			publishInfo.put("actionResult", actionResult);
 			this.messagingTemplate.convertAndSend("/topic/action-result", publishInfo);
 
-			TimeUnit.MILLISECONDS.sleep(500); // for controlling to send-messages speed...
+			TimeUnit.MILLISECONDS.sleep(500); // for controlling send-messages speed...
 
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -252,6 +255,7 @@ public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 	 * 
 	 */
 	public List<ActionResult> getStepHistory() {
+
 		return this.stepHistory;
 	}
 
