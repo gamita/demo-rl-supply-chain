@@ -77,10 +77,12 @@ public class SupplyEnvironment {
 
 
 	/**
-	 * current state of this environment is changed according to a behavior of given action.
+	 * A given action work on this environment.
+	 * 
+	 * After behavior of a given action, current state of this environment changes to next state.
 	 * 
 	 * @param action
-	 * @return action result
+	 * @return action result (including reward and next state)
 	 */
 	public ActionResult receiveAction(Integer action) {
 
@@ -116,7 +118,7 @@ public class SupplyEnvironment {
 	/**
 	 * Action #0 : No Purchase and No Produce
 	 * 
-	 * @return
+	 * @return a result after an executed action
 	 */
 	private ActionResult nothingOperation() {
 
@@ -135,7 +137,7 @@ public class SupplyEnvironment {
 	/**
 	 * Action #1 : only Purchase
 	 * 
-	 * @return
+	 * @return a result after an executed action
 	 */
 	private ActionResult purchase() {
 
@@ -156,7 +158,7 @@ public class SupplyEnvironment {
 	/**
 	 * Action #2 : only Produce
 	 * 
-	 * @return
+	 * @return a result after an executed action
 	 */
 	private ActionResult produce() {
 
@@ -177,7 +179,7 @@ public class SupplyEnvironment {
 	/**
 	 * Action #3 : Purchase and Produce
 	 * 
-	 * @return
+	 * @return a result after an executed action
 	 */
 	private ActionResult purchaseAndProduce() {
 
@@ -262,7 +264,7 @@ public class SupplyEnvironment {
 	 * @param nextTimeOrderQuantity
 	 * @param chanceLossQuantity
 	 * @param shipLossQuantity
-	 * @return
+	 * @return a result after an executed action
 	 * 
 	 */
 	private ActionResult createActionResult(int action, double thisTimeOrderQuantity, double nextTimeOrderQuantity, double chanceLossQuantity, double shipLossQuantity) {
@@ -278,7 +280,7 @@ public class SupplyEnvironment {
 	/**
 	 * Generate customer's order quantity
 	 * 
-	 * @return
+	 * @return order quantity
 	 */
 	private double generateOrderQuantity() {
 

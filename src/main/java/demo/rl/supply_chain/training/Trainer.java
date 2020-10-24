@@ -18,9 +18,9 @@ import demo.rl.supply_chain.model.state.SupplyState;
 
 
 /**
- * Trainer class (Singleton)
+ * Trainer class
  * 
- * This class kicks DQN training with configurations.
+ * This class kicks DQN training with defined configurations.
  * 
  * 
  * @author gamita
@@ -30,7 +30,7 @@ import demo.rl.supply_chain.model.state.SupplyState;
 public class Trainer {
 
 
-	/** Agent */
+	/* agent */
 	private SupplyAgent agent = null;
 
 
@@ -56,7 +56,7 @@ public class Trainer {
 		this.agent = new SupplyAgent();
 
 
-		// initialize q-learning configuration
+		// build q-learning configuration
 		QLearningConfiguration qlConfig =
 
 				QLearningConfiguration.builder()
@@ -92,7 +92,7 @@ public class Trainer {
 
 
 
-		// initialize neural network configuration for DQN
+		// build neural network configuration for DQN
 		DQNFactoryStdDense qlNet =
 
 				new DQNFactoryStdDense(

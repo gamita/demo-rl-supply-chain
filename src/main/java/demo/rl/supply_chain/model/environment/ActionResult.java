@@ -10,14 +10,10 @@ import demo.rl.supply_chain.model.state.SupplyState;
 /**
  * Action Result class
  * 
- * this class includes some info about executed action, inventory qty, reward calculation, next state after executed action
- * etc, as a result of executed action.
+ * This class includes some info about executed actions, inventory qty, reward calculation, next state after executed action etc,
+ * as a result of executed action.
  * 
  * @author gamita
- *
- */
-/**
- * @author yuki.tagami
  *
  */
 public class ActionResult {
@@ -96,7 +92,7 @@ public class ActionResult {
 
 
 	/**
-	 * calculate reward
+	 * Calculate reward
 	 * 
 	 * @return reward
 	 * 
@@ -145,7 +141,7 @@ public class ActionResult {
 
 
 	/**
-	 * chance loss happened or not.
+	 * Chance loss happened or not.
 	 * 
 	 * @return flag whether chance loss happened or not
 	 */
@@ -157,7 +153,7 @@ public class ActionResult {
 
 
 	/**
-	 * shipment loss happened or not.
+	 * Shipment loss happened or not.
 	 * 
 	 * @return flag whether shipment loss happened or not
 	 */
@@ -169,7 +165,7 @@ public class ActionResult {
 
 
 	/**
-	 * over-stock at factory happened or not.
+	 * Over-stock at factory happened or not.
 	 * 
 	 * @return flag whether over-stock at factory loss happened or not
 	 */
@@ -181,7 +177,7 @@ public class ActionResult {
 
 
 	/**
-	 * double over-stock at factory happened or not.
+	 * Double over-stock at factory happened or not.
 	 * 
 	 * @return flag whether double over-stock at factory loss happened or not
 	 */
@@ -193,7 +189,7 @@ public class ActionResult {
 
 
 	/**
-	 * triple over-stock at factory happened or not.
+	 * Triple over-stock at factory happened or not.
 	 * 
 	 * @return flag whether triple over-stock at factory loss happened or not
 	 */
@@ -205,7 +201,7 @@ public class ActionResult {
 
 
 	/**
-	 * over-stock at retailer happened or not.
+	 * Over-stock at retailer happened or not.
 	 * 
 	 * @return flag whether over-stock at retailer loss happened or not
 	 */
@@ -217,7 +213,7 @@ public class ActionResult {
 
 
 	/**
-	 * double over-stock at retailer happened or not.
+	 * Double over-stock at retailer happened or not.
 	 * 
 	 * @return flag whether double over-stock at retailer loss happened or not
 	 */
@@ -229,7 +225,7 @@ public class ActionResult {
 
 
 	/**
-	 * triple over-stock at retailer happened or not.
+	 * Triple over-stock at retailer happened or not.
 	 * 
 	 * @return flag whether triple over-stock at retailer loss happened or not
 	 */
@@ -241,7 +237,7 @@ public class ActionResult {
 
 
 	/**
-	 * return which action were executed in this step.
+	 * Return a executed action in this step.
 	 * 
 	 * @return executed action
 	 */
@@ -253,7 +249,7 @@ public class ActionResult {
 
 
 	/**
-	 * A executed action includes purchase operation or not.
+	 * An executed action includes purchase operation or not.
 	 * 
 	 * @return flag whether executed action includes purchase operation or not
 	 */
@@ -265,7 +261,7 @@ public class ActionResult {
 
 
 	/**
-	 * A executed action includes production operation or not.
+	 * An executed action includes production operation or not.
 	 * 
 	 * @return flag whether executed action includes production operation or not
 	 */
@@ -277,7 +273,7 @@ public class ActionResult {
 
 
 	/**
-	 * return next state after action
+	 * Return next state after action
 	 * 
 	 * @return next state
 	 */
@@ -332,9 +328,9 @@ public class ActionResult {
 
 
 	/**
-	 * return how many items were purchased in this step
+	 * Return purchase quantity in this step
 	 * 
-	 * @return qty that retailer purchase items
+	 * @return purchase quantity in this step
 	 */
 	public double getPurchaseQuantity() {
 
@@ -344,9 +340,9 @@ public class ActionResult {
 
 
 	/**
-	 * return how many items were produces in this step
+	 * Return production quantity in this step
 	 * 
-	 * @return qty that factory produced items
+	 * @return production quantity in this step
 	 */
 	public double getProducionQuantity() {
 
@@ -358,15 +354,15 @@ public class ActionResult {
 	@Override
 	public String toString() {
 
-		return "   Reward: " + this.getReward()
-
-				+ "    Chance Loss: " + this.getChanceLossQuantity()
-
-				+ "    Shipment Loss: " + this.getShipmentLossQuantity()
-
-				+ "    Next State: " + this.nextState.getData();
+		return String.format(
+				"    Reward: %s    Chance Loss: %s    Shipment Loss: %s    Next State: %s ",
+				this.getReward(),
+				this.getChanceLossQuantity(),
+				this.getShipmentLossQuantity(),
+				this.nextState.getData());
 
 	}
+
 
 
 }

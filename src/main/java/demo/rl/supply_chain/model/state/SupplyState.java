@@ -18,7 +18,7 @@ public class SupplyState implements Encodable {
 
 
 	/**
-	 * a vector of the below supply state:
+	 * A vector of the below supply state:
 	 *
 	 * [ This time order qty , Next order qty , Retailer inventory qty, Factory inventory qty]
 	 *

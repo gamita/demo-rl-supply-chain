@@ -23,7 +23,9 @@ import demo.rl.supply_chain.model.state.SupplyState;
 
 /**
  * 
- * Agent class for RL
+ * Agent class of this demo
+ * 
+ * (but accurately, MDP)
  * 
  * @author gamita
  *
@@ -31,27 +33,27 @@ import demo.rl.supply_chain.model.state.SupplyState;
 public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 
 
-	/** Supply Environment */
+	// Supply Environment
 	private SupplyEnvironment environment = new SupplyEnvironment();
 
 
-	/** Observation Space */
+	// Observation Space
 	private ObservationSpace<SupplyState> observationSpace = new SupplyObservationSpace<>();
 
 
-	/** Action Space */
+	// Action Space
 	private DiscreteSpace actionSpace = new DiscreteSpace(4);
 
 
-	/** Step Report */
+	// Step Report
 	private List<ActionResult> stepHistory = new CopyOnWriteArrayList<>();
 
 
-	/** Messaging Template for Web Socket */
+	// Messaging Template for Web Socket
 	private SimpMessagingTemplate messagingTemplate = Application.getContext().getBean(SimpMessagingTemplate.class);
 
 
-	/** Logger */
+	// Logger
 	private Logger logger = LoggerFactory.getLogger(SupplyAgent.class);
 
 
@@ -60,7 +62,7 @@ public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 	/**
 	 * In this method,
 	 * 
-	 * agent executes a action, and get reward and next state as a result of the action.
+	 * agent executes an action, and get reward and next state as a result of the action.
 	 * 
 	 * @see org.deeplearning4j.rl4j.mdp.MDP#step(java.lang.Object)
 	 * 
@@ -72,10 +74,10 @@ public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 		ActionResult actionResult = this.environment.receiveAction(action);
 
 
-		// acquired reward value after action
+		// acquired reward value after the action
 		double reward = actionResult.getReward();
 
-		// next state after an action  (i.e. time point = t + 1) 
+		// next state after the action  (i.e. time point = t + 1) 
 		SupplyState nextState = actionResult.getNextState();
 
 
@@ -89,7 +91,7 @@ public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 
 				null);
 
-		// here is a unrelated method with RL. Just logging, web socket, etc for demo.
+		// an unrelated method with reinforcement learning. Just logging and publishing web socket for demo.
 		doSomethingForDemo(actionResult);
 
 
@@ -100,7 +102,7 @@ public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 
 
 	/**
-	 * return observation space
+	 * Return observation space
 	 * 
 	 * shape of observation space = [4] (see below)
 	 * 
@@ -140,7 +142,7 @@ public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 
 
 	/**
-	 * this method is a initializing method at the start of new episode.
+	 * An initializing method at the start of new episode.
 	 * 
 	 * @see org.deeplearning4j.rl4j.mdp.MDP#reset()
 	 */
@@ -159,7 +161,7 @@ public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 
 
 	/**
-	 * handling for post-training
+	 * Handling for post-training
 	 * 
 	 * @see org.deeplearning4j.rl4j.mdp.MDP#close()
 	 */
@@ -172,9 +174,9 @@ public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 
 
 	/**
-	 * the condition of stopping a episode in progress.
+	 * A condition of stopping a episode in progress.
 	 * 
-	 * Regarding this demo, always "false"
+	 * regarding this demo, always "false"
 	 * 
 	 * @see org.deeplearning4j.rl4j.mdp.MDP#isDone()
 	 */
@@ -187,7 +189,8 @@ public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 
 
 	/**
-	 * Probably, when using A3C algorithm, new agents are created via this method.
+	 *
+	 * Create a new instance
 	 * 
 	 * @see org.deeplearning4j.rl4j.mdp.MDP#newInstance()
 	 */
@@ -209,7 +212,7 @@ public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 	 */
 	private void doSomethingForDemo(ActionResult actionResult) {
 
-		this.logger.info("step # {}  Selected Action: {}  Result | {}", stepHistory.size(), actionResult.getAction(), actionResult);
+		this.logger.info("step # {}    Selected Action: {}    Result | {}", stepHistory.size(), actionResult.getAction(), actionResult);
 
 		this.stepHistory.add(actionResult);
 
@@ -223,7 +226,7 @@ public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 
 
 	/**
-	 * publish web socket info to clients for live-display
+	 * Publish web socket info to clients for live-display
 	 * 
 	 * @param actionResult
 	 */
@@ -249,7 +252,7 @@ public class SupplyAgent implements MDP<SupplyState, Integer, DiscreteSpace> {
 
 
 	/**
-	 * return a list of accumulated action result.
+	 * Return a list of accumulated action result.
 	 * 
 	 * @return step history (list of action result)
 	 * 
