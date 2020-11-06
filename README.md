@@ -1,9 +1,9 @@
-# RL4J Demo for Supply Chain
+# RL4J Demo (Supply Chain)
 
 This application is a demo application of RL4J (see https://deeplearning4j.org/) for my self-study about reinforcement learning.
 
-This application is a motif of "Beer Distribution Game". (see https://en.wikipedia.org/wiki/Beer_distribution_game).  
-"Retailer" and "Factory" manage to balance both supply and inventory not to be overstock and chance/ship loss.  
+A motif of this application is "Beer Distribution Game". (see https://en.wikipedia.org/wiki/Beer_distribution_game).  
+"Retailer" and "Factory" manage to balance both supply and inventory not to be getting overstock and chance/ship loss.  
 
 <img src="./images/simulation-process.gif" style="width: 700px; margin: 30px;">
 
@@ -11,7 +11,7 @@ This application is a motif of "Beer Distribution Game". (see https://en.wikiped
 ## Prerequisites
 
 This application runs on JVM.
-Before you start this application, you need to install the follows softwares.
+Before you start this application, you need to install the following softwares.
 
 - Java (version 8 or later)
 
@@ -45,16 +45,16 @@ If you want to make a fat jar file, please execute following commands.
 $ cd demo-rl-supply-chain
 $ mvn clean package
 $ cd target
-$ java -jar demo-application.jar
+$ java -jar demo-rl-application.jar
 ```
 
-After the spring boot server started, you open your browser (Chrome, Firefox, Edge etc. IE isn't supported)  
+After the spring boot server starts, and then you open your browser (Chrome, Firefox, Edge etc. IE isn't supported)  
 and access to http://localhost:8080/ .
 
-Click "Start Training" button, then a learning will start,  
-and a simulation process will be displayed on your browser after a while. (, when live rendering mode is on)
+Click "Start Training" button, then reinforcement learning will start,  
+and its simulation process will be displayed on your browser after a while. (only when live rendering mode is on)
 
-[Note: At first time build, it will takes long time to build, due to gather necessary libraries.]
+[Note: At the first time build, it will takes long time to build due to gather necessary libraries.]
 
 [Note: If you failed libraries download by Maven, check this blog https://blog.sonatype.com/central-repository-moving-to-https.]
 
@@ -79,25 +79,25 @@ This picture shows the characters in this simulation game.
 
 <img src="./images/environment.png" style="width: 700px; margin: 30px;">
 
-The customer order X items every step.  
+The customer orders X items every step.  
 X is a random number between 1 and 15.  
-the customer also show how many items will order at next step.  
+the customer also shows how many items will order at next step.  
 
-The retailer sells items as much as customer order, from the retailer's inventory.  
-if retailer's inventory quantity is under customer's order quantity, then a chance loss happens.  
+The retailer sells items from the retailer's inventory as much as customer orders.  
+If retailer's inventory quantity is under customer's order quantity, then a chance loss happens.  
 On the other hand, if the retailer purchases too much items in order to avoid chance loss, then it causes overstock.
 
-The factory ship items as much as retailer purchase, from the factory's inventory.  
-if factory's inventory quantity is under retailer's purchase quantity, then a ship loss happens.  
-On the other hand, if the factory produces too much items in order to avoid ship loss, then it causes overstock.
+The factory ship items from the factory's inventory as much as retailer purchases.  
+If factory's inventory quantity is under retailer's purchase quantity, then a shipment loss happens.  
+On the other hand, if the factory produces too much items in order to avoid shipment loss, then it causes overstock.
 
-A chance/ship loss and overstock are penalized. Those are related with a reward calculation. (The details will be described later.)  
-the retailer and the factory manage to balance both supply and inventory not to be overstock and chance/ship loss. 
+A chance/shipment loss and overstock are penalized. Those are related with a reward calculation. (The detail is described later.)  
+The retailer and factory manage to balance both supply and inventory not to be getting overstock and chance/ship loss. 
 
 
 ### State Space:
 
-I defined a state as follows.
+I defined a state space as follows.
 
 The shape of state is [4].
 
@@ -106,19 +106,18 @@ The shape of state is [4].
 
 ### Action Space:
 
-0. **Nothing to do:**  
-   the retailer and the factory does not purchase/produce.
+0. **Do nothing:**  
+   the retailer and factory do not purchase/produce.
    Just sell/ship from their current remaining inventory.
 
 1. **Only Purchase:**  
-   the retailer purchase 30 items per time to the factory.
+   the retailer purchases 30 items per time to the factory.
 
 2. **Only Produce:**  
    the factory produces 80 items per time.
 
-
 3. **Purchase and Produce:**  
-   the retailer and the factory purchases/produces as above.
+   the retailer and factory purchases/produces as above.
 
 
 i.e. non-fixed interval and fixed quantity purchase/production system.
@@ -138,16 +137,16 @@ Base Point = 1
 Penalties are negative rewards such like following.
 
 - Chance loss = -2
-- Ship loss = -2
+- Shipment loss = -2
 - Double Over Stock = -1 ( when retailer's (or factory's) inventory quantity is greater than 60 (or 120). ) 
 - Triple Over Stock = -2 ( when retailer's (or factory's) inventory quantity is greater than 90 (or 180). )
 
 #### Reward Example:
 
-if the retailer happens a chance loss and factory has double over stock,  
+If the retailer causes a chance loss and the factory has double over stock,  
 then Reward = Base Point + Total Penalty = 1 + (-2 -1) = -2 .
 
-if the retailer/factory happens no chance/ship loss and has no over stock,  
+If both retailer and factory cause no chance/shipment loss and have no overstock,  
 then Reward = Base Point + Total Penalty = 1 + 0 = 1 .
 
 
@@ -157,7 +156,7 @@ MIT License
 
 ## References
 
-Please refer to the links below.
+Please refer to the following links.
 
 1. **" Start Reinforcement Learning with RL4J "**
 
