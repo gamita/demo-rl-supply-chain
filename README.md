@@ -1,8 +1,8 @@
-# RL4J Demo (Supply Chain)
+# RL4J Demo (simplified "Beer Game")
 
 This application is a demo application of RL4J (see https://deeplearning4j.org/) for my self-study about reinforcement learning.
 
-A motif of this application is "Beer Distribution Game". (see https://en.wikipedia.org/wiki/Beer_distribution_game).  
+A motif of this application is simplified "Beer Distribution Game". (see https://en.wikipedia.org/wiki/Beer_distribution_game).  
 "Retailer" and "Factory" manage to balance both supply and inventory not to be getting overstock and chance/ship loss.  
 
 <img src="./images/simulation-process.gif" style="width: 700px; margin: 30px;">
